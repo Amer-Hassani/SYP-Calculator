@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة التسوية | SYP Calculator</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700&display=swap"
+        rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f1014">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registered!', reg))
+                    .catch(err => console.log('Service Worker registration failed: ', err));
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="pattern-overlay"></div>
+
+    <div class="app-container">
+        <!-- Language Toggle -->
+        <div class="top-controls">
+            <button id="theme-toggle" class="lang-btn" aria-label="Switch Theme">
+                <span class="theme-icon">☀️</span>
+            </button>
+            <button id="lang-toggle" class="lang-btn" aria-label="Switch Language">
+                <span class="lang-text">English</span>
+            </button>
+        </div>
+
+        <!-- Header -->
+        <header class="header">
+            <h1 data-i18n="title">حاسبة تسوية الدفع</h1>
+            <p class="subtitle" data-i18n="subtitle">للتعامل بالليرة السورية القديمة والجديدة</p>
+        </header>
+
+        <!-- Main Form -->
+        <main class="calculator-card">
+
+            <!-- Field A: Total Price (New SYP) -->
+            <div class="field-group">
+                <label for="input-a">
+                    <span class="label-text" data-i18n="labelA">المبلغ المطلوب دفعه</span>
+                    <span class="currency-badge new-syp" data-i18n="badgeNew">جديد</span>
+                </label>
+                <div class="input-wrapper">
+                    <input type="text" id="input-a" inputmode="none" placeholder="مثلاً 5000" autocomplete="off">
+                </div>
+                <div id="msg-a" class="message-area" aria-live="polite"></div>
+            </div>
+
+            <div class="divider">
+                <span data-i18n="divider">تفاصيل الدفع</span>
+            </div>
+
+            <!-- Field B: Proposed Payment (Old SYP) -->
+            <div class="field-group">
+                <label for="input-b">
+                    <!-- Toggle Button replaces static label -->
+                    <button type="button" id="btn-sign-b" class="sign-toggle-btn" data-i18n="btnPay">دفع</button>
+                    <span class="currency-badge old-syp" data-i18n="badgeOld">قديم</span>
+                </label>
+                <div class="input-wrapper">
+                    <input type="text" id="input-b" inputmode="none" placeholder="مثلاً 200000" autocomplete="off">
+                </div>
+                <!-- Info/Validation Message for B -->
+                <div id="msg-b" class="message-area" aria-live="polite"></div>
+            </div>
+
+            <!-- Field C: Remainder (New SYP) -->
+            <div class="field-group">
+                <label for="input-c">
+                    <button type="button" id="btn-sign-c" class="sign-toggle-btn" data-i18n="btnPay">دفع</button>
+                    <span class="currency-badge new-syp" data-i18n="badgeNew">جديد</span>
+                </label>
+                <div class="input-wrapper">
+                    <input type="text" id="input-c" inputmode="none" placeholder="0" autocomplete="off">
+                </div>
+                <div id="msg-c" class="message-area description-text" aria-live="polite"></div>
+            </div>
+
+            <!-- Virtual Numberpad -->
+            <div class="numberpad-container">
+                <div class="keypad-grid">
+                    <button class="keypad-btn" data-key="1">1</button>
+                    <button class="keypad-btn" data-key="2">2</button>
+                    <button class="keypad-btn" data-key="3">3</button>
+                    <button class="keypad-btn" data-key="4">4</button>
+                    <button class="keypad-btn" data-key="5">5</button>
+                    <button class="keypad-btn" data-key="6">6</button>
+                    <button class="keypad-btn" data-key="7">7</button>
+                    <button class="keypad-btn" data-key="8">8</button>
+                    <button class="keypad-btn" data-key="9">9</button>
+                    <!-- Empty placeholder for alignment since +/- is gone? Or rearrange 0? -->
+                    <!-- Design: 1 2 3 / 4 5 6 / 7 8 9 / Back 0 Blank? Or Back 0 ? -->
+                    <!-- With +/- gone, we have 11 buttons (0-9 + back). 12 slots. -->
+                    <!-- Let's put 0 in middle, backspace on right. Empty on left. -->
+                    <button class="keypad-btn action-btn text-sm" data-key="clear">c</button>
+                    <button class="keypad-btn" data-key="0">0</button>
+                    <button class="keypad-btn action-btn" data-key="backspace">⌫</button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p data-i18n="footer" dir="ltr">1 New SYP = 100 Old SYP</p>
+        </footer>
+    </div>
+
+    <!-- JS -->
+    <script src="app.js"></script>
+</body>
+
+</html>

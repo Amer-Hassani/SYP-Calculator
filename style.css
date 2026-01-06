@@ -1,0 +1,402 @@
+:root {
+    /* Damascus Palette - Dark Mode Default */
+    --bg-body: #0f1014;
+    /* Deep night */
+    --bg-card: rgba(28, 28, 36, 0.85);
+    /* 85% opacity */
+    --bg-input: rgba(38, 38, 48, 0.6);
+    /* 60% opacity */
+
+    --text-primary: #f0f0e8;
+    /* Warm off-white */
+    --text-secondary: #a0a090;
+    /* Warm grey */
+    --text-placeholder: #5a5a54;
+
+    /* Accents */
+    --accent-primary: #bfa36f;
+    /* Antique Gold */
+    --accent-secondary: #3b8ea5;
+    /* Lapis Lazuli / Turquoise */
+    --accent-glow: rgba(191, 163, 111, 0.15);
+
+    --border-subtle: #3a3a40;
+    --border-active: #bfa36f;
+
+    /* Badges */
+    --badge-new-syp-bg: #2a3a40;
+    --badge-new-syp-text: #6edce6;
+    /* Bright Turquoise */
+
+    --badge-old-syp-bg: #3a3020;
+    --badge-old-syp-text: #e6c880;
+    /* Gold */
+
+    --status-error: #ef5350;
+    --status-info: #5c9ea6;
+
+    /* Fonts */
+    --font-ar: 'Cairo', sans-serif;
+    --font-en: 'Outfit', sans-serif;
+    --font-nums: 'Inter', sans-serif;
+    /* For input numbers to keep them uniform */
+}
+
+:root[data-theme="light"] {
+    /* Light Mode - Warm Parchment & Stone */
+    --bg-body: #f8f6f2;
+
+    --bg-card: rgba(255, 255, 255, 0.75);
+    /* Translucent White */
+    --bg-input: rgba(0, 0, 0, 0.05);
+
+    --text-primary: #1a1c18;
+    --text-secondary: #4a5d45;
+    --text-placeholder: #8c9e8a;
+
+    --accent-primary: #b08d2b;
+    /* Darker Gold */
+    --accent-secondary: #2e7d32;
+    /* Darker Green */
+    --accent-glow: rgba(176, 141, 43, 0.15);
+
+    --border-subtle: rgba(0, 0, 0, 0.15);
+    --border-active: #b08d2b;
+
+    /* Badges */
+    --badge-new-syp-bg: rgba(46, 125, 50, 0.2);
+    --badge-new-syp-text: #1b5e20;
+
+    --badge-old-syp-bg: rgba(176, 141, 43, 0.2);
+    --badge-old-syp-text: #826415;
+
+    --status-error: #d32f2f;
+    --status-info: #00796b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    font-family: var(--font-ar);
+    /* Default Arabic */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Geometric Pattern Overlay */
+.pattern-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image: url('background.jpg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.25;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 1;
+}
+
+/* Language Toggle */
+.top-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.lang-btn {
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-en);
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.lang-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+/* Header */
+.header {
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Card */
+.calculator-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    /* Glass effect */
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.calculator-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    opacity: 0.6;
+}
+
+/* Fields */
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+label {
+    color: var(--text-secondary);
+}
+
+.sign-toggle-btn {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+    padding: 2px 12px;
+    border-radius: 6px;
+    font-family: var(--font-ar);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 60px;
+    text-align: center;
+}
+
+.sign-toggle-btn.receive-mode {
+    background: rgba(255, 82, 82, 0.2);
+    border-color: var(--status-error);
+    color: #ff8a80;
+    /* Light red text */
+}
+
+.sign-toggle-btn.pay-mode {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: var(--accent-secondary);
+    color: #a5d6a7;
+    /* Light green text */
+}
+
+.currency-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-family: var(--font-en);
+    letter-spacing: 0.5px;
+}
+
+.currency-badge.new-syp {
+    background: var(--badge-new-syp-bg);
+    color: var(--badge-new-syp-text);
+}
+
+.currency-badge.old-syp {
+    background: var(--badge-old-syp-bg);
+    color: var(--badge-old-syp-text);
+}
+
+.input-wrapper {
+    position: relative;
+    border-radius: 12px;
+    background: var(--bg-input);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    cursor: text;
+}
+
+.input-wrapper.active {
+    border-color: var(--border-active);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 12px 14px;
+    font-family: var(--font-nums);
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    outline: none;
+    direction: ltr;
+    text-align: right;
+    cursor: text;
+}
+
+html[dir="rtl"] input {
+    text-align: left;
+}
+
+html[dir="ltr"] input {
+    text-align: left;
+}
+
+input::placeholder {
+    color: var(--text-placeholder);
+    opacity: 0.5;
+}
+
+/* Messages */
+.message-area {
+    font-size: 0.85rem;
+    min-height: 1.25em;
+    line-height: 1.4;
+    transition: opacity 0.3s ease;
+}
+
+.description-text {
+    font-weight: 500;
+    color: var(--accent-secondary);
+}
+
+.message-error {
+    color: var(--status-error);
+}
+
+.message-info {
+    color: var(--accent-secondary);
+}
+
+/* Divider */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin: 2px 0;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.divider::before {
+    margin-inline-end: 12px;
+}
+
+.divider::after {
+    margin-inline-start: 12px;
+}
+
+/* Numberpad */
+.numberpad-container {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.keypad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.keypad-btn {
+    background: var(--bg-input);
+    /* Now transparent */
+    backdrop-filter: blur(4px);
+    /* improve legibility */
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    padding: 14px 0;
+    border-radius: 12px;
+    font-size: 1.25rem;
+    font-family: var(--font-nums);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.1s;
+    user-select: none;
+}
+
+.keypad-btn:active {
+    background: var(--border-subtle);
+    transform: translateY(2px);
+}
+
+.action-btn {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--accent-primary);
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-placeholder);
+    font-family: var(--font-en);
+    direction: ltr;
+}
+
+@media (max-width: 400px) {
+    .calculator-card {
+        padding: 16px;
+    }
+
+    input {
+        font-size: 1.25rem;
+    }
+
+    .keypad-btn {
+        padding: 12px 0;
+        font-size: 1.1rem;
+    }
+}
