@@ -62,11 +62,11 @@ const i18n = {
 
         descA: "Total amount to settle: {0} New SYP",
 
-        payOld: "You pay Shop {0} Old SYP",
-        receiveOld: "Shop pays You {0} Old SYP",
+        payOld: "You pay the shop {0} Old SYP",
+        receiveOld: "The shop gives you {0} Old SYP",
 
-        payShop: "You pay Shop {0} New SYP",
-        shopPays: "Shop pays You {0} New SYP",
+        payShop: "You pay the shop {0} New SYP",
+        shopPays: "The shop gives you {0} New SYP",
         settled: "Settled! No remainder.",
 
         footer: "1 New SYP = 100 Old SYP"
@@ -80,6 +80,8 @@ const state = {
     A: null,
     B: null,
     C: null,
+    signB: 1, // 1 for Pay (Positive default), -1 for Receive
+    signC: 1, // 1 for Pay
     lang: 'ar',
     activeField: 'A',
     inputBuffer: ''
@@ -98,11 +100,11 @@ const el = {
     inputC: document.getElementById('input-c'),
 
     wrapperA: document.getElementById('input-a').parentElement,
-    wrapperB: document.getElementById('input-b').parentElement,
-    wrapperC: document.getElementById('input-c').parentElement,
+    wrapperB: document.getElementById('wrapper-b'),
+    wrapperC: document.getElementById('wrapper-c'),
 
-    btnSignB: document.getElementById('btn-sign-b'),
-    btnSignC: document.getElementById('btn-sign-c'),
+    // New Toggle Options
+    toggleOptions: document.querySelectorAll('.toggle-option'),
 
     msgA: document.getElementById('msg-a'),
     msgB: document.getElementById('msg-b'),
@@ -163,17 +165,14 @@ function setActiveField(fieldId) {
 
 function updateUI() {
     // 1. Check Disabled Rules
+    // 1. Check Disabled Rules
     if (state.A === null) {
         el.wrapperB.classList.add('disabled');
         el.wrapperC.classList.add('disabled');
-        // Disable sign buttons too?
-        if (el.btnSignB) el.btnSignB.disabled = true;
-        if (el.btnSignC) el.btnSignC.disabled = true;
+        // We DO NOT disable toggles anymore, as per user request
     } else {
         el.wrapperB.classList.remove('disabled');
         el.wrapperC.classList.remove('disabled');
-        if (el.btnSignB) el.btnSignB.disabled = false;
-        if (el.btnSignC) el.btnSignC.disabled = false;
     }
 
     // 2. Put values
@@ -181,25 +180,27 @@ function updateUI() {
     el.inputB.value = state.activeField === 'B' ? formatBuffer(state.inputBuffer) : (state.B !== null ? formatNumber(Math.abs(state.B)) : '');
     el.inputC.value = state.activeField === 'C' ? formatBuffer(state.inputBuffer) : (state.C !== null ? formatNumber(Math.abs(state.C)) : '');
 
-    // 3. Update Sign Buttons
-    updateSignButton(el.btnSignB, state.B);
-    updateSignButton(el.btnSignC, state.C);
+    // 3. Update Toggle Switch Visuals
+    updateToggleVisuals();
 
     renderMessages();
 }
 
-function updateSignButton(btn, value) {
-    if (!btn) return;
-    // Determine mode based on value sign
-    const isReceive = value !== null && value < 0;
+function updateToggleVisuals() {
+    // Update active class for all options
+    document.querySelectorAll('.toggle-option').forEach(opt => {
+        const field = opt.getAttribute('data-field'); // B or C
+        const val = parseInt(opt.getAttribute('data-value')); // 1 or -1
 
-    if (isReceive) {
-        btn.textContent = t('btnReceive');
-        btn.className = 'sign-toggle-btn receive-mode';
-    } else {
-        btn.textContent = t('btnPay');
-        btn.className = 'sign-toggle-btn pay-mode';
-    }
+        // Check current sign state
+        const currentSign = state[`sign${field}`];
+
+        if (currentSign === val) {
+            opt.classList.add('active');
+        } else {
+            opt.classList.remove('active');
+        }
+    });
 }
 
 function formatBuffer(buf) {
@@ -237,6 +238,8 @@ function renderMessages() {
     if (state.C !== null) {
         const val = formatNumber(Math.abs(state.C));
         const safeVal = `\u200E${val}\u200E`;
+        // Use signC to determine direction if C is 0, or just C logic?
+        // Let's rely on C value.
         if (state.C > 0) el.msgC.textContent = t('payShop').replace('{0}', safeVal);
         else if (state.C < 0) { el.msgC.textContent = t('shopPays').replace('{0}', safeVal); el.msgC.classList.add('message-info'); }
         else el.msgC.textContent = t('settled');
@@ -274,6 +277,13 @@ function processInput(char) {
 
         if (val < min || val > max) val = clamp(val, min, max);
         state[state.activeField] = val;
+
+        // Sync Sign State if user typed a value
+        if (state.activeField === 'B' || state.activeField === 'C') {
+            if (val < 0) state[`sign${state.activeField}`] = -1;
+            else if (val >= 0) state[`sign${state.activeField}`] = 1;
+        }
+
     } else {
         state[state.activeField] = null;
     }
@@ -294,8 +304,16 @@ function recalculateLoose() {
 
     if (f === 'A') {
         if (a !== null) {
-            state.B = a * 100;
-            state.C = 0;
+            // Default behavior: Pay all in Old if Pay mode.
+            // If Receive mode, default to 0 Old (Pay all in New).
+            if (state.signB === 1) {
+                state.B = a * 100;
+                state.C = 0;
+            } else {
+                state.B = 0;
+                state.C = a;
+            }
+            state.signC = 1; // Default C to Pay
         } else {
             state.B = null;
             state.C = null;
@@ -305,12 +323,16 @@ function recalculateLoose() {
             // Treat empty B as 0 for calculation purposes
             const valB = b !== null ? b : 0;
             state.C = Math.round(a - (valB / 100));
+            // Update C sign state
+            state.signC = state.C < 0 ? -1 : 1;
         }
     } else if (f === 'C') {
         if (a !== null) {
             // Treat empty C as 0 for calculation purposes
             const valC = c !== null ? c : 0;
             state.B = Math.round((a - valC) * 100);
+            // Update B sign state
+            state.signB = state.B < 0 ? -1 : 1;
         }
     }
 }
@@ -343,11 +365,17 @@ function finalizeInput() {
             // Check if currentC is effectively equal to expectedC
             // (allow for very minor diff due to rounding if any, but our logic is int-based mostly)
             if (Math.abs(expectedC - currentC) > 0.01 || b === null) {
-                // Not consistent, or B didn't exist. Reset to default "Pay" mode.
-                b = a * 100;
+                // Not consistent, or B didn't exist. Reset to default defaults.
+                if (state.signB === 1) {
+                    b = a * 100;
+                    c = 0;
+                } else {
+                    b = 0;
+                    c = a;
+                }
+
                 b = autocorrectToMultiple(b, MULTIPLE_B);
                 b = clamp(b, MIN_B, MAX_B);
-                c = a - (b / 100);
             }
         }
     } else if (f === 'B') {
@@ -359,6 +387,13 @@ function finalizeInput() {
                 c = autocorrectToMultiple(c, MULTIPLE_C);
                 c = clamp(c, MIN_C, MAX_C);
                 b = (a - c) * 100;
+
+                // Sync signs ONLY if value is non-zero
+                if (c !== 0) state.signC = c < 0 ? -1 : 1;
+                // b matches recalc, but if b is 0, keep current sign? 
+                // If b became 0 due to calc, maybe strictly 0 is unsigned?
+                // But for UI stability, let's keep signB if b is 0.
+                if (b !== 0) state.signB = b < 0 ? -1 : 1;
             }
         }
     } else if (f === 'C') {
@@ -369,6 +404,10 @@ function finalizeInput() {
                 b = (a - c) * 100;
                 b = autocorrectToMultiple(b, MULTIPLE_B);
                 b = clamp(b, MIN_B, MAX_B);
+
+                // Sync signs ONLY if non-zero
+                if (b !== 0) state.signB = b < 0 ? -1 : 1;
+                if (c !== 0) state.signC = c < 0 ? -1 : 1;
             }
         }
     }
@@ -409,11 +448,39 @@ function toggleSign(field) {
     updateUI();
 }
 
-if (el.btnSignB) {
-    el.btnSignB.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleSign('B'); });
-}
-if (el.btnSignC) {
-    el.btnSignC.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleSign('C'); });
+// Toggle Options Click Handler
+if (el.toggleOptions) {
+    el.toggleOptions.forEach(opt => {
+        opt.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation(); // prevent triggering wrapper
+
+            const field = opt.getAttribute('data-field'); // B or C
+            const val = parseInt(opt.getAttribute('data-value')); // 1 or -1
+
+            // Set sign
+            state[`sign${field}`] = val;
+
+            // If there is a value in this field, flip it to match
+            if (state[field] !== null) {
+                state[field] = Math.abs(state[field]) * val;
+            }
+
+            // Trigger update based on this change
+            const oldActive = state.activeField;
+            state.activeField = field;
+            // finalizeInput will re-run logic, but we need to ensure it doesn't just overwrite based on A
+            // Actually, simply recalculateLoose might be safer if we just flipped a sign?
+            // If B changes sign, C must update.
+            finalizeInput();
+
+            if (oldActive !== field) {
+                state.activeField = oldActive; // Restore focus/active field
+            }
+
+            updateUI();
+        });
+    });
 }
 
 // Keypad

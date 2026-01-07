@@ -68,12 +68,15 @@
             <!-- Field B: Proposed Payment (Old SYP) -->
             <div class="field-group">
                 <label for="input-b">
-                    <!-- Toggle Button replaces static label -->
-                    <button type="button" id="btn-sign-b" class="sign-toggle-btn" data-i18n="btnPay">دفع</button>
                     <span class="currency-badge old-syp" data-i18n="badgeOld">قديم</span>
                 </label>
-                <div class="input-wrapper">
+                <div class="split-wrapper" id="wrapper-b">
                     <input type="text" id="input-b" inputmode="none" placeholder="مثلاً 200000" autocomplete="off">
+                    <div class="toggle-switch">
+                        <span class="toggle-option pay" data-field="B" data-value="1" data-i18n="btnPay">دفع</span>
+                        <span class="toggle-option receive" data-field="B" data-value="-1"
+                            data-i18n="btnReceive">استلام</span>
+                    </div>
                 </div>
                 <!-- Info/Validation Message for B -->
                 <div id="msg-b" class="message-area" aria-live="polite"></div>
@@ -82,11 +85,15 @@
             <!-- Field C: Remainder (New SYP) -->
             <div class="field-group">
                 <label for="input-c">
-                    <button type="button" id="btn-sign-c" class="sign-toggle-btn" data-i18n="btnPay">دفع</button>
                     <span class="currency-badge new-syp" data-i18n="badgeNew">جديد</span>
                 </label>
-                <div class="input-wrapper">
+                <div class="split-wrapper" id="wrapper-c">
                     <input type="text" id="input-c" inputmode="none" placeholder="0" autocomplete="off">
+                    <div class="toggle-switch">
+                        <span class="toggle-option pay" data-field="C" data-value="1" data-i18n="btnPay">دفع</span>
+                        <span class="toggle-option receive" data-field="C" data-value="-1"
+                            data-i18n="btnReceive">استلام</span>
+                    </div>
                 </div>
                 <div id="msg-c" class="message-area description-text" aria-live="polite"></div>
             </div>
