@@ -451,11 +451,6 @@ function toggleSign(field) {
 // Toggle Options Click Handler
 if (el.toggleOptions) {
     el.toggleOptions.forEach(opt => {
-        // Prevent parent wrapper from consuming the touch event
-        opt.addEventListener('touchstart', (e) => {
-            e.stopPropagation();
-        }, { passive: false });
-
         opt.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation(); // prevent triggering wrapper
@@ -517,8 +512,16 @@ el.keypad.addEventListener('click', (e) => {
     };
 
     w.addEventListener('click', activate);
-    w.addEventListener('mousedown', (e) => { e.preventDefault(); activate(e); });
-    w.addEventListener('touchstart', (e) => { e.preventDefault(); activate(e); });
+    w.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.toggle-option')) return;
+        e.preventDefault();
+        activate(e);
+    });
+    w.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.toggle-option')) return;
+        e.preventDefault();
+        activate(e);
+    });
 
     // Map keyboard
     const inp = el[`input${f}`];
