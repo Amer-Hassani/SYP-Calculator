@@ -88,11 +88,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    padding: 20px;
+    padding: 10px;
     -webkit-font-smoothing: antialiased;
     position: relative;
     overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* Geometric Pattern Overlay */
