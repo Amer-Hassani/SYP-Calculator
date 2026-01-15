@@ -540,6 +540,7 @@ el.keypad.addEventListener('click', (e) => {
 
 function init() {
     setLanguage('ar');
+    setTheme('light');
     setActiveField('A');
     updateUI();
 }
