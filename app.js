@@ -1,7 +1,7 @@
 /**
  * Constants & Configuration
  */
-const MIN_A = 1;
+const MIN_A = 0;
 const MAX_A = 1_000_000_000;
 const MIN_B = -100_000_000_000;
 const MAX_B = 100_000_000_000;
@@ -347,7 +347,6 @@ function finalizeInput() {
 
     if (f === 'A') {
         if (a !== null) {
-            a = autocorrectToMultiple(a, MULTIPLE_A);
             a = clamp(a, MIN_A, MAX_A);
 
             // Should we reset B and C?
