@@ -1,4 +1,4 @@
-const CACHE_NAME = 'syp-calc-v3';
+const CACHE_NAME = 'syp-calc-v4';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -16,6 +16,7 @@ self.addEventListener('install', (event) => {
             return cache.addAll(ASSETS_TO_CACHE);
         })
     );
+    self.skipWaiting();
 });
 
 // Fetch Event
