@@ -413,15 +413,76 @@ input::placeholder {
 
 @media (max-width: 400px) {
     .calculator-card {
-        padding: 16px;
+        padding: 12px;
+    }
+}
+
+/* Extreme Height Optimization for Short Screens */
+@media (max-height: 740px) and (max-width: 500px) {
+    body {
+        padding: 5px;
+    }
+
+    .app-container {
+        gap: 4px;
+    }
+
+    .header h1 {
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+
+    .subtitle {
+        display: none;
+    }
+
+    .top-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+    }
+
+    .lang-btn {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+
+    .calculator-card {
+        padding: 8px 12px;
+        gap: 6px;
+    }
+
+    .field-group {
+        gap: 2px;
+    }
+
+    .currency-badge {
+        font-size: 0.6rem;
     }
 
     input {
-        font-size: 1.25rem;
+        padding: 8px 10px;
+        font-size: 1rem;
+    }
+
+    .divider {
+        margin: 0;
+        font-size: 0.7rem;
+    }
+
+    .message-area {
+        font-size: 0.75rem;
+        min-height: 1.1em;
     }
 
     .keypad-btn {
-        padding: 12px 0;
-        font-size: 1.1rem;
+        padding: 8px 0;
+        font-size: 1rem;
+        border-radius: 8px;
+    }
+
+    .footer {
+        display: none;
     }
 }
