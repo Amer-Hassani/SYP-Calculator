@@ -10,7 +10,6 @@ const ASSETS_TO_CACHE = [
 
 // Install Event
 self.addEventListener('install', (event) => {
-    self.skipWaiting(); // Force this SW to become the active one
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             console.log('[Service Worker] Caching all: app shell and content');
@@ -35,17 +34,14 @@ self.addEventListener('fetch', (event) => {
 // Activate Event (Cleanup old caches if needed)
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        Promise.all([
-            self.clients.claim(), // Take control of all clients immediately
-            caches.keys().then((keyList) => {
-                return Promise.all(
-                    keyList.map((key) => {
-                        if (key !== CACHE_NAME) {
-                            return caches.delete(key);
-                        }
-                    })
-                );
-            })
-        ])
+        caches.keys().then((keyList) => {
+            return Promise.all(
+                keyList.map((key) => {
+                    if (key !== CACHE_NAME) {
+                        return caches.delete(key);
+                    }
+                })
+            );
+        })
     );
 });
