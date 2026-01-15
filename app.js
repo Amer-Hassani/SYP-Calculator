@@ -1,7 +1,7 @@
 /**
  * Constants & Configuration
  */
-const MIN_A = 0;
+const MIN_A = 1;
 const MAX_A = 1_000_000_000;
 const MIN_B = -100_000_000_000;
 const MAX_B = 100_000_000_000;
@@ -337,16 +337,17 @@ function recalculateLoose() {
     }
 }
 
-function finalizeInput() {
+function finalizeInput(fieldToFinalize) {
     if (state.A === null && state.B === null && state.C === null) return;
 
     let a = state.A;
     let b = state.B;
     let c = state.C;
-    const f = state.activeField;
+    const f = fieldToFinalize || state.activeField;
 
     if (f === 'A') {
         if (a !== null) {
+            a = autocorrectToMultiple(a, MULTIPLE_A);
             a = clamp(a, MIN_A, MAX_A);
 
             // Should we reset B and C?
@@ -415,8 +416,11 @@ function finalizeInput() {
     state.B = b;
     state.C = c;
 
-    const newVal = state[f];
-    state.inputBuffer = newVal !== null ? String(newVal) : '';
+    // ONLY update inputBuffer if the field we just finalized is the one the user is actually editing
+    if (f === state.activeField) {
+        const newVal = state[f];
+        state.inputBuffer = newVal !== null ? String(newVal) : '';
+    }
 
     updateUI();
 }
@@ -466,16 +470,8 @@ if (el.toggleOptions) {
             }
 
             // Trigger update based on this change
-            const oldActive = state.activeField;
-            state.activeField = field;
-            // finalizeInput will re-run logic, but we need to ensure it doesn't just overwrite based on A
-            // Actually, simply recalculateLoose might be safer if we just flipped a sign?
-            // If B changes sign, C must update.
-            finalizeInput();
-
-            if (oldActive !== field) {
-                state.activeField = oldActive; // Restore focus/active field
-            }
+            // We finalize specifically this field without changing the global activeField
+            finalizeInput(field);
 
             updateUI();
         });

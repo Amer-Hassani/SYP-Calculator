@@ -105,7 +105,7 @@ body {
     pointer-events: none;
     z-index: -1;
     background: transparent;
-    opacity: 0;
+    opacity: 0.25;
 }
 
 .app-container {
@@ -364,8 +364,8 @@ input::placeholder {
 /* Numberpad */
 .numberpad-container {
     border-top: 1px solid var(--border-subtle);
-    margin-top: 24px;
-    padding-top: 16px;
+    margin-top: 16px;
+    padding-top: 8px;
 }
 
 .keypad-grid {
