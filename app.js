@@ -451,6 +451,11 @@ function toggleSign(field) {
 // Toggle Options Click Handler
 if (el.toggleOptions) {
     el.toggleOptions.forEach(opt => {
+        // Prevent parent wrapper from consuming the touch event
+        opt.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+        }, { passive: false });
+
         opt.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation(); // prevent triggering wrapper
