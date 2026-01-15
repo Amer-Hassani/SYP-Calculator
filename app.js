@@ -304,16 +304,21 @@ function recalculateLoose() {
 
     if (f === 'A') {
         if (a !== null) {
-            // Default behavior: Pay all in Old if Pay mode.
-            // If Receive mode, default to 0 Old (Pay all in New).
-            if (state.signB === 1) {
-                state.B = a * 100;
-                state.C = 0;
+            // Non-destructive: If B is already something, keep it and update C
+            if (state.B !== null && state.B !== 0) {
+                state.C = Math.round(a - (state.B / 100));
+                state.signC = state.C < 0 ? -1 : 1;
             } else {
-                state.B = 0;
-                state.C = a;
+                // Default fallback
+                if (state.signB === 1) {
+                    state.B = a * 100;
+                    state.C = 0;
+                } else {
+                    state.B = 0;
+                    state.C = a;
+                }
+                state.signC = 1;
             }
-            state.signC = 1; // Default C to Pay
         } else {
             state.B = null;
             state.C = null;
@@ -362,10 +367,15 @@ function finalizeInput(fieldToFinalize) {
 
             const expectedC = a - (currentB / 100);
 
-            // Check if currentC is effectively equal to expectedC
-            // (allow for very minor diff due to rounding if any, but our logic is int-based mostly)
-            if (Math.abs(expectedC - currentC) > 0.01 || b === null) {
-                // Not consistent, or B didn't exist. Reset to default defaults.
+            // If we have a non-zero B, we just adjust C to match the new A
+            if (currentB !== 0) {
+                c = expectedC;
+                c = autocorrectToMultiple(c, MULTIPLE_C);
+                c = clamp(c, MIN_C, MAX_C);
+                // Re-sync B if C changed due to clamping
+                b = (a - c) * 100;
+            } else if (Math.abs(expectedC - currentC) > 0.01 || b === null) {
+                // Only use "Receive defaults" (0/A) if B was already 0 or null
                 if (state.signB === 1) {
                     b = a * 100;
                     c = 0;
@@ -377,6 +387,9 @@ function finalizeInput(fieldToFinalize) {
                 b = autocorrectToMultiple(b, MULTIPLE_B);
                 b = clamp(b, MIN_B, MAX_B);
             }
+            // Sync signs
+            if (b !== 0) state.signB = b < 0 ? -1 : 1;
+            if (c !== 0) state.signC = c < 0 ? -1 : 1;
         }
     } else if (f === 'B') {
         if (b !== null) {
