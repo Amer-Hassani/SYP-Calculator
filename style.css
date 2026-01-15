@@ -166,7 +166,7 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: 20px;
-    padding: 16px;
+    padding: 12px;
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(8px);
     /* Glass effect */
@@ -245,7 +245,7 @@ input {
     border: none;
     padding: 12px 14px;
     font-family: var(--font-nums);
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 600;
     color: var(--text-primary);
     outline: none;
