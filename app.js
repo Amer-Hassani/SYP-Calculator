@@ -304,21 +304,12 @@ function recalculateLoose() {
 
     if (f === 'A') {
         if (a !== null) {
-            // Non-destructive: If B is already something, keep it and update C
-            if (state.B !== null && state.B !== 0) {
-                state.C = Math.round(a - (state.B / 100));
-                state.signC = state.C < 0 ? -1 : 1;
-            } else {
-                // Default fallback
-                if (state.signB === 1) {
-                    state.B = a * 100;
-                    state.C = 0;
-                } else {
-                    state.B = 0;
-                    state.C = a;
-                }
-                state.signC = 1;
-            }
+            // Preserve current B if it exists, otherwise default
+            const currentB = b !== null ? b : (state.signB === 1 ? a * 100 : 0);
+            state.B = currentB;
+            state.C = Math.round(a - (currentB / 100));
+            // Update C sign state based on the new remainder
+            state.signC = state.C < 0 ? -1 : 1;
         } else {
             state.B = null;
             state.C = null;
@@ -355,41 +346,22 @@ function finalizeInput(fieldToFinalize) {
             a = autocorrectToMultiple(a, MULTIPLE_A);
             a = clamp(a, MIN_A, MAX_A);
 
-            // Should we reset B and C?
-            // Only reset if the current B/C values are NOT consistent with A
-            // Equation is: A = (B/100) + C
-            // We use a small epsilon or loose equality since floating point might differ slightly,
-            // but here we are dealing with integers mostly (or rounded).
-            // Let's calculate expected C given current B
+            // Preserve current B, ensuring it's valid
+            let currentB = b !== null ? b : (state.signB === 1 ? a * 100 : 0);
+            currentB = autocorrectToMultiple(currentB, MULTIPLE_B);
+            currentB = clamp(currentB, MIN_B, MAX_B);
 
-            const currentB = b !== null ? b : 0;
-            const currentC = c !== null ? c : 0;
+            b = currentB;
+            c = a - (b / 100);
+            c = autocorrectToMultiple(c, MULTIPLE_C);
+            c = clamp(c, MIN_C, MAX_C);
 
-            const expectedC = a - (currentB / 100);
+            // Re-sync b again if c changed after clamp/autocorrect
+            b = (a - c) * 100;
 
-            // If we have a non-zero B, we just adjust C to match the new A
-            if (currentB !== 0) {
-                c = expectedC;
-                c = autocorrectToMultiple(c, MULTIPLE_C);
-                c = clamp(c, MIN_C, MAX_C);
-                // Re-sync B if C changed due to clamping
-                b = (a - c) * 100;
-            } else if (Math.abs(expectedC - currentC) > 0.01 || b === null) {
-                // Only use "Receive defaults" (0/A) if B was already 0 or null
-                if (state.signB === 1) {
-                    b = a * 100;
-                    c = 0;
-                } else {
-                    b = 0;
-                    c = a;
-                }
-
-                b = autocorrectToMultiple(b, MULTIPLE_B);
-                b = clamp(b, MIN_B, MAX_B);
-            }
-            // Sync signs
-            if (b !== 0) state.signB = b < 0 ? -1 : 1;
+            // Sync sign for C
             if (c !== 0) state.signC = c < 0 ? -1 : 1;
+            if (b !== 0) state.signB = b < 0 ? -1 : 1;
         }
     } else if (f === 'B') {
         if (b !== null) {
@@ -471,6 +443,9 @@ if (el.toggleOptions) {
             e.preventDefault();
             e.stopPropagation(); // prevent triggering wrapper
 
+            // First, finalize the CURRENT active field (e.g., Box A) to ensure rounding is applied
+            finalizeInput();
+
             const field = opt.getAttribute('data-field'); // B or C
             const val = parseInt(opt.getAttribute('data-value')); // 1 or -1
 
@@ -483,9 +458,7 @@ if (el.toggleOptions) {
             }
 
             // Trigger update based on this change
-            // First, finalize the field the user was JUST typing in (to ensure rounding)
-            finalizeInput();
-            // Then, finalize specifically this field without changing the global activeField
+            // We finalize specifically this field without changing the global activeField
             finalizeInput(field);
 
             updateUI();
