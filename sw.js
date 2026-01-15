@@ -1,4 +1,4 @@
-const CACHE_NAME = 'syp-calc-v7';
+const CACHE_NAME = 'syp-calc-v8';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',

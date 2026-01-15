@@ -470,7 +470,9 @@ if (el.toggleOptions) {
             }
 
             // Trigger update based on this change
-            // We finalize specifically this field without changing the global activeField
+            // First, finalize the field the user was JUST typing in (to ensure rounding)
+            finalizeInput();
+            // Then, finalize specifically this field without changing the global activeField
             finalizeInput(field);
 
             updateUI();
